@@ -50,21 +50,14 @@ def dot_matrix(seq1, seq2, window_size = 1, allowed_mismatches = 0, step = 1):
 def plot_dot_matrix(matrix):
     cmap = LinearSegmentedColormap.from_list('', ['white', 'black'])
 
-    graph, plt1 = plt.subplots(figsize = (100,100), dpi= 240)
-
-    # plt1.hlines(y=range(len(seq1)),
-    #       xmin=0, xmax=len(seq1),
-    #       color='gray', alpha=0.7, linewidth=1,linestyles='dashdot')
-    # plt1.vlines(x=range(len(seq2)),
-    #       ymin=0, ymax=len(seq2),
-    #       color='gray', alpha=0.7, linewidth=1,linestyles='dashdot')
+    graph, plt1 = plt.subplots(dpi= 240)
 
     plt1.imshow(matrix, cmap=cmap)
-    plt1.set_xticks(range(len(seq1)))
-    plt1.set_yticks(range(len(seq2)))
-    plt1.invert_yaxis()
-    plt1.set_yticklabels(list(seq2))
-    plt1.set_xticklabels(list(seq1))
+    plt1.tick_params(top=True, labeltop=True, bottom=False, labelbottom=False)
+    plt1.set_xticks(range(len(seq2)))
+    plt1.set_yticks(range(len(seq1)))
+    plt1.set_yticklabels(list(seq1))
+    plt1.set_xticklabels(list(seq2))
     plt.show()
 
 

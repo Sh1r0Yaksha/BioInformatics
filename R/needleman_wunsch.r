@@ -1,18 +1,22 @@
 rm(list = ls())
+# Install these libraries in case they don't exist
 library("stringr")
 library("stringi")
 
+# Put Sequences here
 seq1 <- "ATTTCTAGGGAAGTTTCAGATGGAGAAATGTGTGGACCATTCAGGCCCTAAAAGTTGGTATAAAGAT"
 seq2 <- "AAGCACCGCGTAGGCCAGCTGGCCGGATCCCGCCGTCTGTCATGGCGGCCCCCATCCTGAAAGG"
 
+# The respective match score, mismatch score and gap penalty
 match_score <- 1
 mismatch_score <- -1
 gap_penalty <- -2
 
+# Breaking the string into a vector of characters - like ['A','C','T','G']
 s1_v <- strsplit(seq1, NULL)[[1]]
 s2_v <- strsplit(seq2, NULL)[[1]]
 
-
+# Function to check whether two base pairs match or don't, and returns the respective score
 check_match <- function(a, b, match, mismatch) {
   if (str_trim(a) == str_trim(b)) {
     return(match)
@@ -21,7 +25,7 @@ check_match <- function(a, b, match, mismatch) {
   }
 }
 
-
+# Function to generate the similarity matrix based on gap penalty and match/mismatch score
 generate_matrix <- function(seq1, seq2, match_score, mismatch_score, gap_score) {
 
   sim_matrix <- matrix(0, nrow = length(seq2) + 1, ncol = length(seq1) + 1)
@@ -47,6 +51,7 @@ generate_matrix <- function(seq1, seq2, match_score, mismatch_score, gap_score) 
               score = sim_matrix[nrow(sim_matrix), ncol(sim_matrix)]))
 }
 
+# Function to align the two sequences tracing back the similarity matrix
 pairwise_align <- function(seq1, seq2, match_score, mismatch_score, gap_penalty) {
 
   result <- generate_matrix(seq1, seq2, match_score, mismatch_score, gap_penalty)
@@ -58,10 +63,10 @@ pairwise_align <- function(seq1, seq2, match_score, mismatch_score, gap_penalty)
 
   while (col_seq1 > 1 || row_seq2 > 1) {
     if (col_seq1 > 1 && row_seq2 > 1) {
-      diag <- sim_matrix[row_seq2, col_seq1] == sim_matrix[row_seq2 - 1,col_seq1 - 1] + # nolint
-              check_match(seq2[row_seq2 - 1], seq1[col_seq1 - 1], match_score, mismatch_score) # nolint
-      delete <- sim_matrix[row_seq2, col_seq1] == sim_matrix[row_seq2 - 1, col_seq1] + gap_penalty # nolint
-      insert = sim_matrix[row_seq2, col_seq1] == sim_matrix[row_seq2, col_seq1 - 1] + gap_penalty # nolint
+      diag <- sim_matrix[row_seq2, col_seq1] == sim_matrix[row_seq2 - 1,col_seq1 - 1] +
+              check_match(seq2[row_seq2 - 1], seq1[col_seq1 - 1], match_score, mismatch_score)
+      delete <- sim_matrix[row_seq2, col_seq1] == sim_matrix[row_seq2 - 1, col_seq1] + gap_penalty
+      insert = sim_matrix[row_seq2, col_seq1] == sim_matrix[row_seq2, col_seq1 - 1] + gap_penalty
 
       if (insert) {
         alignment_a <- paste0(alignment_a, seq1[col_seq1 - 1])
@@ -99,6 +104,7 @@ pairwise_align <- function(seq1, seq2, match_score, mismatch_score, gap_penalty)
   return(list(alignment_a = alignment_a, alignment_b = alignment_b, score = result$score))
 }
 
+# Printing the results
 align <- pairwise_align(s1_v, s2_v, match_score, mismatch_score, gap_penalty)
 
 cat("Alignment 1: ", align$alignment_a, "\n")
